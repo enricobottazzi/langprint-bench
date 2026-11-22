@@ -73,6 +73,11 @@ class ScoreTests(unittest.TestCase):
     def test_redaction_bars_have_a_pinned_font(self):
         self.assertGreater(score({"lang": "ru", "text": "город ██████"}), 0)
 
+    def test_enclosed_digits_have_a_pinned_font(self):
+        for lang in ("en", "ar", "hi"):
+            with self.subTest(lang=lang):
+                self.assertEqual(score({"lang": lang, "text": "① ② ③ ④"}), 1 / 21)
+
 
 if __name__ == "__main__":
     unittest.main()

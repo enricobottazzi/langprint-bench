@@ -88,7 +88,7 @@ Render locally in headless Chromium through Playwright, using the paperback read
 - One column, start-aligned, with Arabic right-to-left and the other languages left-to-right. Use normal browser wrapping, without automatic hyphenation or forced word breaking.
 - No extra paragraph spacing. Indent each paragraph's first line by **1.3 em (15.6 px)**, except the first paragraph on each rendered page, which is unindented.
 
-Exact font files and SHA-256 checksums are pinned in `score.py`. They are downloaded and verified on first use, then cached. Other-script fonts fall back to Noto Serif for uncovered characters, and every language also has Noto Sans Mono for symbols. Unintended system-font fallback causes an error. Wait for fonts to load before measuring, and use the same pinned dependencies and Chromium version for comparable runs.
+Exact font files and SHA-256 checksums are pinned in `score.py`. They are downloaded and verified on first use, then cached. Other-script fonts fall back to Noto Serif for uncovered characters, and every language also has Noto Sans Mono for symbols. Noto Serif JP is the final fallback when it is not already the primary font, covering enclosed digits such as ①②③④ retained in translations. Unintended system-font fallback causes an error. Wait for fonts to load before measuring, and use the same pinned dependencies and Chromium version for comparable runs.
 
 ### Pagination and score
 

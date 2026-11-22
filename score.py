@@ -227,6 +227,10 @@ def score(entry: Mapping[str, object]) -> float:
     families = [primary] if primary == "Noto Serif" else [primary, "Noto Serif"]
     # Explicit fallback for source characters such as SCP redaction bars (█).
     families.append("Noto Sans Mono")
+    # Translations can retain enclosed digits (①②③④). The already pinned
+    # Japanese font covers them; keep existing glyph choices ahead of it.
+    if primary != "Noto Serif JP":
+        families.append("Noto Serif JP")
     font_paths = {
         f"https://langprint.invalid/{index}.ttf": _font_path(family)
         for index, family in enumerate(families)

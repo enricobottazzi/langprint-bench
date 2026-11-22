@@ -21,7 +21,9 @@ Only `lang` and `text` affect the result. The scorer uses the fixed layout in
 section 3 of [methodology.md](methodology.md). Exact Noto font files are downloaded
 on first use and cached in `.cache/fonts/`; a language can be scored offline once
 its fonts are cached. Noto Sans Mono supplies missing symbols such as redaction
-bars. Passage text stays local. Run checks with `python -m unittest -v test_score`.
+bars; the pinned Noto Serif JP font is the final fallback for enclosed digits
+such as ①②③④. Passage text stays local. Run checks with
+`python -m unittest -v test_score`.
 
 ## Translation
 
