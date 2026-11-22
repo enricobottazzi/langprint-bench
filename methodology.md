@@ -1,145 +1,126 @@
 # LangPrint Bench — methodology
 
-**Question:** how much space does the same message occupy on a printed page across languages?
+**Question:** how much printed page space does the same message occupy across languages?
 
-Proposed protocol, 22 November 2026. This is a one-day exploratory experiment. No data has been collected yet.
+## 1. Corpus
 
-## 1. Scope
+`data/results.json` contains **200 original passages**: **20 per source language and two per source-language/domain pair**. Each original is translated directly into the other nine languages. The complete dataset contains **200 originals and 1,800 translations: 2,000 texts**, with 200 versions in each target language.
 
-Use **100 passages: five in each of 20 domains**, rendered in ten languages. This gives 100 originals, 900 translations and **1,000 text blocks**.
+**Languages, in index order:** English (`en`), Arabic (`ar`), Simplified Chinese (`zh-Hans`), German (`de`), Hindi (`hi`), Italian (`it`), Japanese (`ja`), Russian (`ru`), Spanish (`es`) and Swahili (`sw`).
 
-| Language | Dataset / HTML code | Translation API code | Font |
-| --- | --- | --- | --- |
-| English | `en` | `en` | Noto Sans |
-| Arabic | `ar` | `ar` | Noto Sans Arabic |
-| Simplified Chinese | `zh-Hans` | `zh-CN` | Noto Sans CJK SC |
-| German | `de` | `de` | Noto Sans |
-| Hindi | `hi` | `hi` | Noto Sans Devanagari |
-| Italian | `it` | `it` | Noto Sans |
-| Japanese | `ja` | `ja` | Noto Sans CJK JP |
-| Russian | `ru` | `ru` | Noto Sans |
-| Spanish | `es` | `es` | Noto Sans |
-| Swahili | `sw` | `sw` | Noto Sans |
+**Domains, in index order:** fiction/stories, news, food/cooking, health, travel/places, sports, work/money, nature/environment, science/technology, and arts/culture.
 
-Swahili adds a Bantu language to the sample. This selection spans several language families and writing systems; it is not a representative sample of the world's languages. See the [UN's Kiswahili overview](https://www.un.org/en/observances/kiswahili-day).
+### Sourcing
 
-## 2. Corpus and source languages
+Select roughly **10–20 complete, substantive sentences of contiguous prose** from each of two different documents per language/domain. Headings, captions, salutations, fragments and list labels do not satisfy the sentence minimum. Do not stitch together nonadjacent ordinary prose. Different, nonoverlapping chapters of a larger work may supply different domains; distinct anthology stories count as separate works. Independently authored and titled wiki articles count as separate documents within a shared cookbook; the cookbook still counts as one source family.
 
-Do not use English as the source for every passage. That would answer the narrower question of how English originals expand or contract in translation. Translated text can retain features of its source language; [research on translationese](https://aclanthology.org/2020.emnlp-main.6/) shows why original-versus-translated status matters in evaluation.
+Works must have been **first published in 2000–2020 inclusive**. Check original publication or speech dates, printed journal issues, edition credits and native creation histories. Reprints, repository uploads and `dateModified` do not establish first publication. Any uncertain first-publication interval must fall wholly within the window. **Later web edits are allowed**; historical copies corroborate provenance and wording rather than imposing a separate last-edit cutoff.
 
-Instead, use **ten originals per language**, written directly in that language. Each original is a different message; its nine translations provide the matched comparisons.
+Search publisher and author sites, institutional archives, native-language community histories and open journals. Read the actual source before selecting its excerpt. Prefer primary texts with reuse terms that allow the planned translations; reject explicitly translated articles, uncertain originals, inaccessible or unreliable text, and list-heavy candidates. Website language alone is insufficient.
 
-For a feasible one-day corpus, draft originals with one multilingual generation model and label the corpus as synthetic. Record the model identifier, prompt template, date and edits. Do not translate an English draft and label the result an original in another language. Freeze the corpus before the main translation run.
+To reduce concentration, use **at least four source families per language**, with **no family providing more than eight passages (40%)** and **no identified individual writer or speaker providing more than four (20%)**. A family means a publisher, institution or editorial collection. Group mirrors with their underlying source, and journal articles on CyberLeninka together conservatively. Wikinews, Wikibooks and Wikivoyage are separate editorial collections; this does not cap the entire Wikimedia ecosystem at 40%.
 
-Use this domain order:
+The resulting source inventory is:
 
-1. Physics
-2. Biology
-3. Medicine and health
-4. Environment and climate
-5. Computer science
-6. Engineering
-7. Mathematics
-8. Economics
-9. Finance
-10. Business and workplace
-11. Law
-12. Politics and public affairs
-13. History
-14. Philosophy
-15. Psychology
-16. News reporting
-17. Travel and geography
-18. Food and cooking
-19. Arts and culture
-20. Literary fiction
-
-These are practical content strata, with some overlap between topic and genre.
-
-**Source allocation:** initialize a seeded random generator with seed `42`. For each consecutive pair of domains, freshly shuffle the ten language codes in the table above. Assign the first five to one domain and the other five to the next, one original per assigned language. Save the resulting allocation, rather than relying on the seed alone. Every domain then has five distinct source languages, and every language supplies ten originals overall.
-
-**Passage constraints:** one self-contained prose paragraph, roughly five to seven substantive statements or story events. Use ordinary sentences, with no headings, lists, tables, code, equations or poetry. Give each passage a distinct content brief. Do not impose equal word, character or token counts across languages, and do not select passages based on their rendered area. Record the brief and original text under a stable passage ID.
-
-## 3. Translation
-
-Use **Google Cloud Translation Basic v2, explicitly selecting `model=nmt` and `format=text`**, for all language pairs. Its [language support](https://docs.cloud.google.com/translate/docs/languages) covers the selected languages; the [API reference](https://docs.cloud.google.com/translate/docs/reference/rest/v2/translate) specifies these request fields.
-
-- Set the source and target language explicitly. Retain the original unchanged for its own language row.
-- Submit every target request from the original text. Do not chain translations through an English output. The provider's internal routing is outside our control.
-- Do not request shortening, length matching or stylistic rewriting. Use no custom glossary.
-- Cache the first successful response for each original-text hash, source, target and engine configuration. Retry transport failures, not valid translations whose length looks unusual.
-- Retain raw responses, the exact text used for rendering, request settings and timestamps. Document any response decoding or whitespace normalization. Preserve punctuation and script-specific characters.
-
-The hosted NMT model is not an immutable model snapshot. Archived outputs make this dataset reproducible even if later API calls change.
-
-## 4. Typography and measurement
-
-Measure **occupied layout area**: the fixed column width multiplied by the paragraph's rendered height. This includes spaces, line spacing and unused space on the final line. It measures page space allocated to the passage, rather than counting dark ink pixels.
-
-| Setting | Value |
+| Language | Sources used (passage counts) |
 | --- | --- |
-| Print reference | A4, 25 mm margins; 160 mm text width |
-| Type | Bundled Noto fonts from the table; regular, 12 pt |
-| Line height | Fixed 18 pt for every language |
-| Alignment | Start-aligned; Arabic right-to-left, all others left-to-right |
-| Spacing | Default letter and word spacing; zero paragraph margins, padding and borders |
-| Wrapping | Normal language-aware wrapping; hyphenation disabled; no forced word splitting |
-| Rendering | One pinned Playwright/Chromium build and operating environment; print media, 100% scale |
+| English | [Cory Doctorow](https://craphound.com/overclocked/) stories (2); [Obama White House archive](https://obamawhitehouse.archives.gov/) (4); [NASA](https://www.nasa.gov/) (2); [NIH News in Health](https://newsinhealth.nih.gov/) (4); [English Wikivoyage](https://en.wikivoyage.org/) (2); [Distill](https://distill.pub/) (2); [PLOS](https://journals.plos.org/) (2); [The Public Domain Review](https://publicdomainreview.org/) (2). |
+| Arabic | [SyriaUntold](https://syriauntold.com/) narratives, reporting and features (8); [EIPR](https://eipr.org/) institutional texts and signed staff essays, including author reprints (8); [An-Najah University journal](https://journals.najah.edu/) original sports studies (2); [Al-Academy, University of Baghdad](https://jcofarts.uobaghdad.edu.iq/) original arts criticism (2). |
+| Chinese | [Chinese Wikinews](https://zh.wikinews.org/) native reports (6); [SCP-CN](https://scp-wiki-cn.wikidot.com/) originals (2); [Taiwan agriculture/forestry publications](https://kmweb.moa.gov.tw/) (8); original Chinese educational essays from [NTU ScienceOnline's university archive](https://case.ntu.edu.tw/highscope/all-posts-index.html) (4). Explicitly translated entries in that archive were excluded. |
+| German | [Arne Babenhauserheide](https://www.draketo.de/) stories (2); [German Wikinews](https://de.wikinews.org/) (8); [Wikibooks cookbook](https://de.wikibooks.org/) (2); [Robert Koch-Institut](https://edoc.rki.de/) studies (2); [Wikivoyage](https://de.wikivoyage.org/) (2); [Geographica Helvetica](https://gh.copernicus.org/) (2); AVINUS/ffk Journal (1); [Musica Docta](https://musicadocta.unibo.it/) (1). |
+| Hindi | Room to Read and Pratham Books Hindi stories, checked against [StoryWeaver](https://storyweaver.org.in/) original/translation metadata (2); [India Water Portal](https://hindi.indiawaterportal.org/) signed Hindi writing (8); Unmukt's CC0 blogs (4); original Hindi JARSSC papers (3); native Hindi Wikinews (1); original *Mann Ki Baat* broadcasts through [PMIndia](https://www.pmindia.gov.in/hi/) and [PIB](https://www.pib.gov.in/) (2 different episodes). |
+| Italian | Wu Ming novels via [Liber Liber](https://www.liberliber.eu/) (2); [Italian Wikinews](https://it.wikinews.org/) (8); [Wikibooks](https://it.wikibooks.org/) (1); [Scenario/Aniarti](https://scenario.aniarti.it/) original nursing studies (2); [Wikivoyage](https://it.wikivoyage.org/) (2); [Sergio Bellucci](https://www.sergiobellucci.it/) essays (2); University of Bologna's [Musica Docta](https://musicadocta.unibo.it/) (2) and [Umanistica Digitale](https://umanisticadigitale.unibo.it/) (1). The Bologna journals are grouped conservatively as one family. |
+| Japanese | [SCP-JP](https://scp-jp.wikidot.com/) originals (2); [Japanese Wikinews](https://ja.wikinews.org/) (2); MAFF chef interview (1); MEXT reports/plans (5), MHLW reports (3), MLIT reports (2), including [National Diet Library WARP](https://warp.ndl.go.jp/) copies; Ecological Society of Japan field study (1); Association for Natural Language Processing papers (2); Japan Society for Digital Archive papers (2). J-STAGE is a host for five papers from three societies. |
+| Russian | Native Russian SCP stories (2); [Russian Wikinews](https://ru.wikinews.org/) (4); [NEWSru](https://www.newsru.com/) food reporting/explanations (2); original Russian journal papers via [CyberLeninka](https://cyberleninka.ru/) (8); [Wikivoyage](https://ru.wikivoyage.org/) (2); [Teplitsa of Social Technologies](https://te-st.org/) original interviews (2). |
+| Spanish | Two distinct stories from *Violetas para Luisa y otros cuentos* ([UAEMex edition](https://ri.uaemex.mx/handle/20.500.11799/22494)); [Spanish Wikinews](https://es.wikinews.org/) (8); [Fondo Gastronómico](https://fondogastronomico.blogspot.com/) (2); [Mundo por Libre](https://www.mundoporlibre.com/) (2); MEDISAN (1); [Salud Colectiva](https://revistas.unla.edu.ar/saludcolectiva/) (1); [Ingeniería e Investigación](https://revistas.unal.edu.co/index.php/ingeinv/) (2); [Aisthesis](https://revistaaisthesis.uc.cl/) (2). |
+| Swahili | [African Storybook](https://www.africanstorybook.org/) originals (3); native Swahili [Global Voices](https://sw.globalvoices.org/) reports (3); [MAELEZO](https://blog.maelezo.go.tz/) local reporting/features (6); original Swahili scholarship through Editon (4), UDSM journals (3) and East African Scholars Journal of Education, Humanities and Literature (1; repository copy at Embu). All 20 are different works with 19 distinct bylines; no Magufuli speeches remain. |
 
-Use explicit language and direction attributes. Bundle exact font files, record their hashes and check actual font usage; do not rely on system font substitution. Wait for fonts to finish loading before measurement. Noto provides [script-specific families](https://notofonts.github.io/noto-docs/website/use/), rather than one font that covers everything identically.
+### Verification and extraction
 
-Render each paragraph in an unpaginated block with the print settings above. Measure its bounding rectangle, excluding labels and surrounding UI. Convert CSS pixels to physical units using `96 CSS px = 25.4 mm`, as defined by [CSS absolute units](https://www.w3.org/TR/css-values-4/#absolute-lengths):
+Establish original-language composition using translation-direction credits, author accounts, native creation/drafting histories, firsthand interviews, original research reports or institutional authorship. Examples include StoryWeaver's original-story links; English counterparts explicitly translated from Swahili; Hindi broadcasts labelled “English rendering” in their English versions; and named translation credits in the English counterparts of the selected German RKI articles. For community texts, inspect initial drafts and imports: a maintenance editor or importing account is not necessarily the author. Where explicit direction evidence is unavailable, the decision rests on positive primary authorship and composition context, not language identification alone. Bilingual abstracts alone do not establish translation direction.
 
-```text
-height_mm = height_css_px × 25.4 / 96
-area_cm2 = width_mm × height_mm / 100
+Copy consecutive prose. Remove markup, navigation, headings, captions, duplicate pullquotes, footnotes and page furniture; retain substantive quotations and ordinary prose embedded in tables. Check PDF columns, page joins and scans against rendered page images. Join layout word breaks, preserve lexical hyphens, and normalize artificial extraction spacing. Preserve source wording, punctuation and spelling; do not silently rewrite awkward or dated prose. For Arabic scans, compare visible text with available text layers/OCR and resolve differences against the printed page. Automated extraction can omit quotation boxes or insert footers, so successful downloading alone is not verification.
+
+Traditional Chinese prose is converted to Simplified Chinese through MediaWiki `zh-hans` or OpenCC `t2s`. This is script conversion, not language translation; titles retain the source script. Remove mathematical display formatting only when preserving the same visible literal value as plain text.
+
+Fetch `title` from the actual article, work or chapter heading rather than an invented summary or truncated search/SEO title. `source` is an absolute URL identifying the publication, frozen revision or archived edition. Check source correspondence and sentence boundaries manually, then run programmatic checks for UTF-8, required fields, integer `original`, unique IDs, language, dates and all 100 balanced language/domain cells. Compare normalized titles as well as passages.
+
+Duplicate screening uses normalized full texts, within-language character 5-grams (Jaccard ≥ 0.20 or containment ≥ 0.35 for review), and shared runs of at least 80 letters/digits. Review candidates against their sources; no selected excerpts may overlap. The final 22 November 2026 audit found **no duplicate titles, exact/near-duplicate passages or shared 80-character runs**. Selected publication dates span **2000–2020**. Publication provenance is assessed without an AI detector.
+
+### Organization and limits
+
+Each entry has only **`idx`, `lang`, `discipline`, `title`, `source`, `text`, `original`**. The array is grouped by **language**, then `idx`. IDs **1–200** identify the source passages, not array positions. Every language version of a passage shares its original's `idx`; **`(idx, lang)` is unique**. Source entries have integer **`original: 1`** and translations have integer **`original: 0`**. A translation keeps its source's `discipline`, `title` and `source`, changing only `lang`, `text` and `original`. The original record is preserved.
+
+Language and topic counts are exactly balanced; genres, years and countries are not statistically balanced. The source-family limits reduce publisher/author dominance without making this a representative sample of each language. Japanese retains ten ministry-report passages and reuses distinct, nonoverlapping chapters from MEXT and MHLW annual volumes. German cookbook passages share a book; the Spanish stories share an anthology. German uses 12 passages and Italian 11 from three Wikimedia editorial collections each; their combined platform share therefore exceeds the individual-collection cap. Russian retains eight scholarly passages, Hindi eight India Water Portal texts, and Arabic eight each from SyriaUntold and EIPR.
+
+“Stories” includes documentary narratives; food includes production and safety, and travel includes place/transport descriptions. Modern criticism may discuss older works; the date criterion applies to the selected modern composition. Reuse terms vary, including attribution, noncommercial and share-alike obligations; the corpus has no implied common licence. Measurements describe this selected sample under the stated typography, rather than all writing in these languages.
+
+## 2. Translation
+
+Use **Google Cloud Translation Basic v2**, explicitly selecting **`model=nmt`**, **`format=text`**, and the source and target languages. The dataset uses `zh-Hans`; requests use Google's `zh-CN` code. Translate each original's body text directly into the other nine languages, keeping the original unchanged for its own language. Do not shorten, rewrite or manually correct the returned translations, and do not translate source titles or other metadata.
+
+[`translate.py`](translate.py) reads the API key from `GOOGLE_TRANSLATE_API_KEY` or the macOS Keychain service `langprint-bench.google-translate`. It requires an explicit `--idx ID` or `--all` selection; `--dry-run` reports uncached work and gross character cost without reading credentials or making API calls. The default output is the combined `data/results.json`; `--output PATH` can select a different combined output file.
+
+Cache each first successful raw response, exact request and UTC timestamp under `data/translation-cache/`, keyed by a SHA-256 hash of the endpoint, original text, language pair and engine settings. Reuse matching cached responses when resuming. Preserve returned text exactly, without HTML unescaping or whitespace normalization. Temporary HTTP 429/5xx and connection failures receive at most three attempts; ambiguous network failures can cause duplicate billed requests. Invalid or empty responses are not cached.
+
+Merge completed translations into the dataset atomically on exit, including when a later request fails. Retain previous records and replace matching `(idx, lang)` versions without duplicates. If another process edits the input during translation, keep the cached responses and stop before overwriting that edit. Run one translation process at a time.
+
+**No semantic translation review is performed for this exploratory run.** Retain the engine's outputs, including any meaning errors. Technical checks verify response structure, nonempty text and complete language coverage. Translation errors therefore remain a limitation of the comparison.
+
+## 3. Measurement: `score.py` and fractional pages
+
+[`score.py`](score.py) implements the occupied-page measurement. Call it separately for each original or translated passage:
+
+```python
+from score import score
+
+occupied_pages = score(entry)
 ```
 
-Save unrounded measurements. Round only for display. This estimates text-block area; it does not measure whole-page counts, pagination or printer output. With fixed width and line height, area changes in whole-line increments, so small differences are coarse.
+`entry` is a decoded JSON object. Only **`lang` and `text`** affect the result; the function ignores titles and other metadata and returns an **unrounded float**. Installation instructions are in the [README](README.md#occupied-page-score).
 
-Equal point size is a reproducible convention, not a guarantee of equal perceived size or readability across scripts. Results describe this typography setup.
+### Reference layout
 
-## 5. One heatmap
+Render locally in headless Chromium through Playwright, using the paperback reader's fixed layout:
 
-**Rows:** ten languages. **Columns:** twenty domains. Each cell summarizes the five matched passages in that domain.
+- Page: **465 × 624 CSS pixels**, with **50 px side margins**, 40 px top padding, 52 px bottom padding and a 47 px running-title reservation. The usable body is **365 × 485 px**.
+- Regular **12 px** type, weight 400 and **1.85 line height** (nominally 22.2 px), with font synthesis and optical sizing disabled. Use Noto Serif for English, German, Italian, Russian, Spanish and Swahili; Noto Naskh Arabic for Arabic; Noto Serif Devanagari for Hindi; Noto Serif SC for Chinese; and Noto Serif JP for Japanese.
+- One column, start-aligned, with Arabic right-to-left and the other languages left-to-right. Use normal browser wrapping, without automatic hyphenation or forced word breaking.
+- No extra paragraph spacing. Indent each paragraph's first line by **1.3 em (15.6 px)**, except the first paragraph on each rendered page, which is unindented.
 
-Normalize within each passage so neither English nor another language supplies the reference:
+Exact font files and SHA-256 checksums are pinned in `score.py`. They are downloaded and verified on first use, then cached. Other-script fonts fall back to Noto Serif for uncovered characters, and every language also has Noto Sans Mono for symbols. Unintended system-font fallback causes an error. Wait for fonts to load before measuring, and use the same pinned dependencies and Chromium version for comparable runs.
+
+### Pagination and score
+
+1. Treat one or more newline characters as a paragraph boundary, trim paragraphs and discard empty ones. Ordinary whitespace within a paragraph collapses according to normal browser layout.
+2. Fill pages in reading order. Use whitespace-delimited tokens for most languages and `Intl.Segmenter` word segments for Japanese and Chinese. For each paragraph, a binary search finds the largest token prefix whose rendered block fits; any remaining text continues on the next page. Chromium determines the actual line wrapping.
+3. Keep the reader's **2 px fitting allowance**: text must fit within **483 px** of the 485 px body. The fixed scoring capacity is **21 rendered lines per page**.
+4. Measure the actual height of one rendered line after the fonts load, including browser subpixel rounding. Divide each page's body-block height by that line height and round to the nearest integer to recover its rendered line count. Sum those counts and calculate:
 
 ```text
-A[p,l] = area of passage p in language l
-G[p]   = geometric mean of A[p,l] across all ten languages
-R[p,l] = A[p,l] / G[p]
-H[l,d] = geometric mean of R[p,l] across the five passages in domain d
+occupied pages = total rendered lines / 21
 ```
 
-Cell colour represents `H[l,d]`, on a diverging scale centred at `1`, with colour distance proportional to `log2(H)`. This treats a doubling and a halving symmetrically. Label the legend in ratios: `1.20×` means 20% more area than the passage-level multilingual geometric reference, aggregated across the domain.
+This counts rendered lines at the fixed width, font and line spacing. Each line contributes **1/21 of a page**, regardless of how much horizontal space it fills. Titles, running headers, page numbers, blank paragraphs and unused page-bottom space do not count. A full **21-line page scores exactly 1.00**; **22 lines score 22/21 ≈ 1.0476**, and **42 lines score exactly 2.00**. Browser wrapping determines the line count, rather than the number of source newline characters. The returned float is not rounded to whole pages.
 
-Selecting a cell shows its mean absolute area in cm², sample count and five individual passage ratios, with access to the original and translated text. Keep raw area available because the reference depends on the selected language set. Publish one heatmap, with its settings and a downloadable dataset.
+Whitespace-only text returns **0.0**. Invalid inputs, missing or corrupt fonts, unsupported glyphs requiring system fonts, or text that clips horizontally or vertically raise errors rather than producing a score. The function does not write scores into `data/results.json`; retain measurements separately for the normalization in step 4.
 
-## 6. Quality checks and interpretation
+Run `python -m unittest -v test_score` after installing dependencies to check multilingual rendering, pagination, repeatability, metadata exclusion, font coverage and overflow handling. Smaller reader screens should scale the reference pages without reflowing the measured text.
 
-Before the full run, pilot one original from each source language and its translations. Check fonts, Arabic shaping and direction, Hindi marks, CJK wrapping, overflow and clipping. Freeze the typography after this pilot.
+## 4. Heatmap and checks
 
-Check all records for missing or empty text, failed requests, unexpected language/script, accidental source copying and rendering failures. Treat automatic language checks as flags for review. Inspect at least two translations into each target language, using bilingual review where available and explicitly labelling model-assisted review otherwise. Check preservation of statements, events, numbers and negation. A back-translation alone does not establish fidelity.
+Produce **one heatmap**: languages on the y-axis, domains on the x-axis. Normalize each passage against the average occupied pages of its ten language versions, then average the ratios within each domain:
 
-Do not silently edit or discard inconvenient results. Log issues and their resolution. If a serious unresolved issue invalidates one version, exclude that passage across all ten languages from the main comparison. Display a domain with fewer than five complete passages as incomplete, rather than substituting a different sample or showing a full-result cell.
+```text
+passage ratio = occupied pages / average pages across its ten versions
+heatmap cell = average passage ratio across the domain's usable passages (normally 20)
+```
 
-Balanced sources reduce English-specific bias; they do not remove translation effects. Each domain contains only five source languages, and original-versus-translated status varies within domain cells. Five passages per domain support an exploratory visualization, not stable language rankings or claims about inherent linguistic efficiency. The source generator, translation engine, corpus and fonts all influence the result.
+**1.00 = multilingual average; 1.20 = 20% more space; 0.80 = 20% less.** This controls for passage length and gives each passage equal weight. Use one shared colour scale centred at 1, and retain raw page counts. Scores are relative to the selected ten languages.
 
-## 7. Split the work
+Check for missing or empty translations, duplicate `(idx, lang)` pairs, missing glyphs and clipped text. Require all ten technically usable versions of each passage; semantic translation review is outside this run's scope. If a technical problem cannot be resolved, exclude that passage across **all languages** before calculating ratios and averages. Mark the affected domain as incomplete and show its remaining passage count. Treat results as an exploratory comparison under these typography settings.
 
-**Graphical interface:** build a static page with the single heatmap, legend, cell selection, passage inspection, methodology link and figure/data download. Read the experiment export; keep translation and measurement out of the interface. Any fixture data must be clearly marked as a demo.
+## 5. Work split
 
-**Experiment and data collection:** create and freeze the corpus, translate with caching, render in the controlled environment, run checks and export the measurements and cell summaries. Save configuration, corpus provenance, translation responses, font hashes and software versions alongside the results.
-
-Agree on one shared export, `data/results.json`, before either implementation starts:
-
-- `schema_version`, `run_id`, `status` (`demo`, `partial` or `complete`) and run metadata.
-- Ordered `languages` and `domains` arrays, plus the typography and engine configuration.
-- `passages`: stable ID, domain, source language, original text and source provenance.
-- `renderings`: passage ID, language, text, original/translation flag, width and height in mm, area in cm², normalized ratio and quality status.
-- `cells`: language, domain, geometric mean ratio, arithmetic mean area in cm², `n`, completeness status and contributing passage IDs. Incomplete cells have null summary values.
-
-The experiment owns these calculations; the interface displays the exported values. Do not present demo or partial output as completed experiment results.
-
-**One-day sequence:** first freeze the protocol, export fields and pilot settings. Then build the interface and run corpus/translation/measurement work in parallel. Finish by checking the integrated heatmap against the underlying records and publishing the figure, data and methodology together.
+- **Interface:** display the heatmap and let users inspect the passages.
+- **Experiment:** curate `data/results.json`, translate the originals, render all language versions and export raw page counts, passage ratios and heatmap cell averages.
