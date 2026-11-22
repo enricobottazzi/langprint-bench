@@ -49,11 +49,12 @@ and `original` is `0`. Originals retain `original: 1`. Records are grouped by
 language, then `idx`; `(idx, lang)` identifies a unique version. A complete run
 contains **200 originals + 1,800 translations = 2,000 records**. Only originals
 are sent to Google, so translations are never chained through another language.
-Use `--output PATH` to write the combined corpus elsewhere instead.
+Existing original `occupied_pages` measurements are retained; translated versions
+are measured separately. Use `--output PATH` to write the combined corpus elsewhere instead.
 
 Each first successful raw response, exact request settings and UTC timestamp
-are saved atomically under `data/translation-cache/`. Keep this directory with
-the experiment. A rerun reuses matching cached responses without API calls or
+are saved atomically under `data/translation-cache/`, which is ignored by Git.
+Keep this local directory with the experiment. A rerun reuses matching cached responses without API calls or
 Keychain access; changing the original text or engine settings creates a new
 cache key. Successful responses are retained after interruptions, and completed
 records are merged into the dataset when a run exits. Reruns do not duplicate
