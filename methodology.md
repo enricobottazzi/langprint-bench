@@ -69,7 +69,7 @@ Merge completed translations into the dataset atomically on exit, including when
 
 ## 3. Measurement: `score.py` and fractional pages
 
-[`score.py`](score.py) implements the occupied-page measurement. Call it separately for each original or translated passage:
+[`score.py`](score.py) implements the occupied-page measurement using [`renderer.js`](renderer.js), the same prose styling and automatic pagination engine used by the static book. Call it separately for each original or translated passage:
 
 ```python
 from score import score
@@ -92,6 +92,8 @@ Exact font files and SHA-256 checksums are pinned in `score.py`. They are downlo
 
 ### Pagination and score
 
+Book prose is supplied as continuous section text, with page breaks generated after fonts load. Pages fill up to 21 lines before continuing; only the final page may be partially filled. The title and heatmap use their own layouts.
+
 1. Treat one or more newline characters as a paragraph boundary, trim paragraphs and discard empty ones. Ordinary whitespace within a paragraph collapses according to normal browser layout.
 2. Fill pages in reading order. Use whitespace-delimited tokens for most languages and `Intl.Segmenter` word segments for Japanese and Chinese. For each paragraph, a binary search finds the largest token prefix whose rendered block fits; any remaining text continues on the next page. Chromium determines the actual line wrapping.
 3. Keep the reader's **2 px fitting allowance**: text must fit within **483 px** of the 485 px body. The fixed scoring capacity is **21 rendered lines per page**.
@@ -105,7 +107,7 @@ This counts rendered lines at the fixed width, font and line spacing. Each line 
 
 Whitespace-only text returns **0.0**. Invalid inputs, missing or corrupt fonts, unsupported glyphs requiring system fonts, or text that clips horizontally or vertically raise errors rather than producing a score. The function does not write scores into `data/results.json`; retain measurements separately for the normalization in step 4.
 
-Run `python -m unittest -v test_score` after installing dependencies to check multilingual rendering, pagination, repeatability, metadata exclusion, font coverage and overflow handling. Smaller reader screens should scale the reference pages without reflowing the measured text.
+Run `python -m unittest -v test_score test_renderer` after installing dependencies to check multilingual rendering, pagination, repeatability, metadata exclusion, font coverage and overflow handling. Smaller reader screens should scale the reference pages without reflowing the measured text.
 
 ## 4. Heatmap and checks
 

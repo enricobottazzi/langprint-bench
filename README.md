@@ -5,6 +5,38 @@ How much space does the same message occupy on a printed page across languages?
 The dataset contains **200 original passages and 1,800 translations** across
 ten languages and ten domains. All 2,000 versions have occupied-page scores.
 
+## Static interface
+
+Open [index.html](index.html) directly in a browser, keeping `renderer.js` beside
+it. The site is static HTML/CSS/JavaScript, with no server, build step or external
+requests. Use edge arrows, left/right keys or a horizontal edge drag on desktop.
+Home and Contents icons stay at the top left on desktop and mobile.
+On mobile, every generated page appears in one continuous vertical scroll.
+
+About is stored as one continuous text. The book and `score.py` both call
+[`renderer.js`](renderer.js) for the same prose styles and automatic pagination.
+It fills each page up to 21 lines when text remains, then continues onto the next.
+Reference pages are scaled on smaller screens without changing line breaks.
+Title and heatmap pages retain their dedicated layouts.
+
+Page 1 is the title and page 2 the heatmap; visible page numbers begin at 3.
+The contents begin on page 5, follow the heatmap’s discipline order, and list
+English display translations of all 200 titles, grouped under discipline
+headings with indented entries and starting page numbers. Original corpus titles
+are unchanged. Each text reserves `2 * ceil(max(occupied_pages) / 2)` pages
+using all ten language versions. The 200 English texts follow the complete contents spread. Unused pages in each
+text’s allocation remain blank and numbered, including on mobile. Click a contents
+entry to open its first page. Left pages carry the text title; right pages carry
+the discipline. An asterisk beside a title marks a passage originally written
+in English, in both Contents and the running title. Reserved blank pages keep
+their running header and page number. Contents entries flow into the
+same fixed page area, keeping a discipline heading with its first title.
+
+The 100 cells are a snapshot of [data/heatmap.json](data/heatmap.json), using the
+same ordered axes, ratios and shared 0.6–1.4 scale. Keep the embedded table in
+sync when updating the exported results. The font licence is in `assets/fonts/OFL.txt`. Small embedded Noto subsets preserve
+the scorer’s fonts for redaction bars, circled digits and π in the English texts.
+
 ## Occupied-page score
 
 ```sh
@@ -26,7 +58,7 @@ on first use and cached in `.cache/fonts/`; a language can be scored offline onc
 its fonts are cached. Noto Sans Mono supplies missing symbols such as redaction
 bars; the pinned Noto Serif JP font is the final fallback for enclosed digits
 such as ①②③④. Passage text stays local. Run checks with
-`python -m unittest -v test_score`.
+`python -m unittest -v test_score test_renderer`.
 
 ## Translation
 
@@ -105,7 +137,7 @@ that language/domain, with `n: 20`. Every passage receives equal weight.
 The export also records its metric, aggregation, reference value and source
 file hash.
 
-The figure uses one linear diverging colour scale centred at **1.0**. Blue
+The figure uses one linear diverging colour scale centred at **1.0**. Green
 means less space and red means more. These results describe this selected
 corpus, Google NMT and the fixed Noto typography.
 

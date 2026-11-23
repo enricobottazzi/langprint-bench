@@ -6,7 +6,9 @@ Usage: from score import score; occupied_pages = score(entry)
 Only ``lang`` and ``text`` affect the score. Fonts are downloaded from a pinned
 Google Fonts revision on first use, verified, and cached in .cache/fonts beside
 this file. Set LANGPRINT_FONT_CACHE to use another cache directory. Passage text
-is rendered locally and is never included in font download requests.
+is rendered locally and is never included in font download requests. The
+shared renderer.js beside this file supplies the same text layout and pagination
+used by the static book interface.
 """
 
 from __future__ import annotations
@@ -70,95 +72,27 @@ _HTML = """<!doctype html><meta charset="utf-8">
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; }
-  #page { width: 465px; height: 624px; padding: 40px 50px 52px; }
-  #running { height: 47px; }
-  .copy {
-    font-size: 12px; font-weight: 400; line-height: 1.85;
-    font-synthesis: none; font-optical-sizing: none;
-    text-align: start; white-space: normal; hyphens: none;
-    word-break: normal; overflow-wrap: normal;
-  }
-  .copy p { margin: 0; padding: 0; text-indent: 1.3em; }
-  .copy p:first-child { text-indent: 0; }
-  #glyph-check { width: 365px; }
 </style>
-<div id="page"><div id="running"></div><div id="copy" class="copy"></div></div>
-<div id="glyph-check" class="copy"></div>
+<div id="glyph-check" class="lp-copy"></div>
 """
 
-_MEASURE = r"""async ({lang, text, fonts, bodyHeight, linesPerPage}) => {
+_MEASURE = r"""async ({lang, text, fonts}) => {
   for (const {family, url} of fonts) {
     const face = new FontFace(family, `url("${url}")`, {weight: '400'});
     document.fonts.add(await face.load());
   }
   const family = fonts.map(font => JSON.stringify(font.family)).join(', ');
-  const page = document.getElementById('page');
-  page.lang = lang;
-  page.dir = lang === 'ar' ? 'rtl' : 'ltr';
-  const body = document.getElementById('copy');
-  body.style.fontFamily = family;
-  await document.fonts.load(`400 12px ${JSON.stringify(fonts[0].family)}`, text);
-  await document.fonts.ready;
+  const result = await LangPrintRenderer.paginate({lang, text, fontFamily: family});
 
-  // Calibrate the actual line box, including Chromium's subpixel rounding.
-  const probe = document.createElement('p');
-  probe.textContent = '\u00a0';
-  body.append(probe);
-  const lineHeight = probe.getBoundingClientRect().height;
-  probe.remove();
-  if (!Number.isFinite(lineHeight) || lineHeight <= 0) {
-    throw new Error('Cannot measure the rendered line height.');
-  }
-
-  // Keep the reader's fitting tolerance; score by its 21-line capacity.
-  const limit = bodyHeight - 2;
-  const pages = [];
-  let current = [];
-  function finish() {
-    if (!current.length) return;
-    const height = body.getBoundingClientRect().height;
-    if (height > limit + 0.02 || body.scrollWidth > body.clientWidth + 1) {
-      throw new Error('Text overflows the fixed page; it cannot be scored without clipping.');
-    }
-    const lines = Math.round(height / lineHeight);
-    pages.push({height, lines, paragraphs: current});
-    current = [];
-    body.replaceChildren();
-  }
-  const cjk = lang === 'ja' || lang === 'zh-Hans';
-  const segmenter = cjk ? new Intl.Segmenter(lang, {granularity: 'word'}) : null;
-  for (const paragraph of text.replace(/\r\n/g, '\n').split(/\n+/).map(p => p.trim()).filter(Boolean)) {
-    let tokens = cjk ? [...segmenter.segment(paragraph)].map(p => p.segment)
-                     : (paragraph.match(/\S+\s*/g) || []);
-    while (tokens.length) {
-      const p = document.createElement('p');
-      body.append(p);
-      let lo = 0, hi = tokens.length;
-      while (lo < hi) {
-        const mid = Math.ceil((lo + hi) / 2);
-        p.textContent = tokens.slice(0, mid).join('');
-        if (body.getBoundingClientRect().height <= limit) lo = mid;
-        else hi = mid - 1;
-      }
-      if (lo === 0 && current.length) {
-        p.remove(); finish(); continue;
-      }
-      const count = Math.max(1, lo);
-      p.textContent = tokens.slice(0, count).join('').trimEnd();
-      current.push(p.textContent);
-      tokens = tokens.slice(count);
-      if (tokens.length) finish();
-    }
-  }
-  finish();
-
-  // Keep a text node available for Chromium's actual-font check, independently
-  // of the temporary pages above. Its geometry is never part of the score.
+  // Keep a text node for Chromium's actual-font check. Its geometry is never
+  // counted by the shared paginator.
   const check = document.getElementById('glyph-check');
-  check.lang = lang; check.dir = page.dir; check.style.fontFamily = family;
+  check.lang = lang;
+  check.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  check.style.width = LangPrintRenderer.layout.bodyWidth + 'px';
+  check.style.fontFamily = family;
   check.textContent = text;
-  const totalLines = pages.reduce((sum, p) => sum + p.lines, 0);
-  return {pages, occupied_pages: totalLines / linesPerPage};
+  return result;
 }"""
 
 
@@ -198,7 +132,7 @@ def _font_path(family: str) -> Path:
 
 
 def score(entry: Mapping[str, object]) -> float:
-    """Return rendered line count / 21 for a JSON-decoded passage entry.
+    """Return shared-renderer line count / 21 for a JSON-decoded passage entry.
 
     Required keys: ``lang`` (one of the ten methodology codes), ``text`` (str).
     Other fields, including title and original/translated status, are ignored.
@@ -214,6 +148,15 @@ def score(entry: Mapping[str, object]) -> float:
         raise TypeError("entry['text'] must be a string")
     if not text.strip():
         return 0.0
+
+    renderer_path = Path(__file__).with_name("renderer.js")
+    try:
+        renderer_js = renderer_path.read_text(encoding="utf-8")
+    except FileNotFoundError as error:
+        raise RuntimeError(
+            f"Shared pagination engine missing: {renderer_path}. "
+            "Keep renderer.js beside score.py."
+        ) from error
 
     try:
         from playwright.sync_api import sync_playwright
@@ -256,9 +199,9 @@ def score(entry: Mapping[str, object]) -> float:
             context.route("**/*", serve_font)
             page = context.new_page()
             page.set_content(_HTML)
+            page.add_script_tag(content=renderer_js)
             result = page.evaluate(_MEASURE, {
-                "lang": lang, "text": text, "bodyHeight": BODY_HEIGHT,
-                "linesPerPage": LINES_PER_PAGE,
+                "lang": lang, "text": text,
                 "fonts": [
                     {"family": family, "url": url}
                     for family, url in zip(families, font_paths)

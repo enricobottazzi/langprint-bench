@@ -71,7 +71,7 @@ def render_heatmap(data, path):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    from matplotlib.colors import TwoSlopeNorm
+    from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
     import numpy as np
 
     lookup = {(c["lang"], c["discipline"]): c["occupied_pages_ratio"] for c in data["cells"]}
@@ -79,7 +79,9 @@ def render_heatmap(data, path):
     # One symmetric, linear scale for the entire matrix, centred at 1.0.
     span = max(0.05, math.ceil(float(np.max(np.abs(values - 1))) * 20) / 20)
     norm = TwoSlopeNorm(vmin=1-span, vcenter=1, vmax=1+span)
-    cmap = plt.get_cmap("RdBu_r")
+    cmap = LinearSegmentedColormap.from_list(
+        "LangPrint", ["#87ab8b", "#fbf5e7", "#c77f78"], N=257
+    )
     with plt.rc_context({"font.family": "DejaVu Sans", "font.size": 12}):
         fig, ax = plt.subplots(figsize=(12.8, 8.8))
         fig.subplots_adjust(left=.19, right=.98, top=.87, bottom=.22)
