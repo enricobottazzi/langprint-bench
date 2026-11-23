@@ -49,7 +49,7 @@ Duplicate screening uses normalized full texts, within-language character 5-gram
 
 ### Organization and limits
 
-Each entry has **`idx`, `lang`, `discipline`, `title`, `source`, `text`, `original`**. Measured entries may also have `occupied_pages`; existing original measurements are retained, while translations are measured separately. The array is grouped by **language**, then `idx`. IDs **1–200** identify the source passages, not array positions. Every language version of a passage shares its original's `idx`; **`(idx, lang)` is unique**. Source entries have integer **`original: 1`** and translations have integer **`original: 0`**. A translation keeps its source's `discipline`, `title` and `source`, changing only `lang`, `text` and `original`. The original record is preserved.
+Each entry has **`idx`, `lang`, `discipline`, `title`, `source`, `text`, `original`**. Measured entries may also have `occupied_pages`; existing original measurements are retained, while translations are measured separately. The array is grouped by **`idx`**, with the original first in each group. IDs **1–200** identify the source passages, not array positions. Every language version of a passage shares its original's `idx`; **`(idx, lang)` is unique**. Source entries have integer **`original: 1`** and translations have integer **`original: 0`**. A translation keeps its source's `discipline`, `title` and `source`, changing only `lang`, `text` and `original`. The original record is preserved.
 
 Language and topic counts are exactly balanced; genres, years and countries are not statistically balanced. The source-family limits reduce publisher/author dominance without making this a representative sample of each language. Japanese retains ten ministry-report passages and reuses distinct, nonoverlapping chapters from MEXT and MHLW annual volumes. German cookbook passages share a book; the Spanish stories share an anthology. German uses 12 passages and Italian 11 from three Wikimedia editorial collections each; their combined platform share therefore exceeds the individual-collection cap. Russian retains eight scholarly passages, Hindi eight India Water Portal texts, and Arabic eight each from SyriaUntold and EIPR.
 
@@ -112,9 +112,12 @@ Run `python -m unittest -v test_score` after installing dependencies to check mu
 Produce **one heatmap**: languages on the y-axis, domains on the x-axis. Normalize each passage against the average occupied pages of its ten language versions, then average the ratios within each domain:
 
 ```text
-passage ratio = occupied pages / average pages across its ten versions
-heatmap cell = average passage ratio across the domain's usable passages (normally 20)
+occupied_pages_avg = arithmetic mean of occupied_pages across its ten versions
+occupied_pages_ratio = occupied_pages / occupied_pages_avg
+heatmap cell = arithmetic mean of occupied_pages_ratio across the domain's 20 passages
 ```
+
+[`heatmap.py`](heatmap.py) exports the 100 cells to `data/heatmap.json` and renders `data/heatmap.png`. Each cell records its language, domain, unrounded mean `occupied_pages_ratio` and passage count `n: 20`. The export includes the ordered axes, aggregation, reference value and source-file SHA-256. Stored passage averages and ratios are validated against raw scores before aggregation.
 
 **1.00 = multilingual average; 1.20 = 20% more space; 0.80 = 20% less.** This controls for passage length and gives each passage equal weight. Use one shared colour scale centred at 1, and retain raw page counts. Scores are relative to the selected ten languages.
 

@@ -2,6 +2,9 @@
 
 How much space does the same message occupy on a printed page across languages?
 
+The dataset contains **200 original passages and 1,800 translations** across
+ten languages and ten domains. All 2,000 versions have occupied-page scores.
+
 ## Occupied-page score
 
 ```sh
@@ -47,8 +50,8 @@ python3 translate.py --all
 The runner adds translations directly to `data/results.json`, preserving every
 original record. A translation keeps the source passage's `idx`, `discipline`,
 `title` and `source`; its `lang` is the target language, `text` is the translation
-and `original` is `0`. Originals retain `original: 1`. Records are grouped by
-language, then `idx`; `(idx, lang)` identifies a unique version. A complete run
+and `original` is `0`. Originals retain `original: 1`;
+`(idx, lang)` identifies a unique version. A complete run
 contains **200 originals + 1,800 translations = 2,000 records**. Only originals
 are sent to Google, so translations are never chained through another language.
 Existing original `occupied_pages` measurements are retained; translated versions
@@ -71,3 +74,39 @@ conversion. Run offline checks with `python3 -m unittest -v test_translate`.
 Translations are retained as returned by the engine, without semantic quality
 review or manual corrections. Technical checks cover nonempty responses,
 supported languages, complete coverage and record structure.
+
+## Data and heatmap
+
+[`data/results.json`](data/results.json) is ordered by `idx`, with the original
+first and its nine translations following. Each record includes:
+
+| Field | Meaning |
+| --- | --- |
+| `occupied_pages` | Rendered body-text lines divided by 21. |
+| `occupied_pages_avg` | Arithmetic mean of `occupied_pages` across the ten versions sharing an `idx`. |
+| `occupied_pages_ratio` | `occupied_pages / occupied_pages_avg`. |
+
+Ratios are dimensionless: **1.20 means 20% more page space** than the same
+passage's multilingual average; **0.80 means 20% less**. Values are not rounded
+in the dataset.
+
+After installing the requirements above, rebuild the heatmap with:
+
+```sh
+python heatmap.py
+python -m unittest -v test_heatmap
+```
+
+This writes [`data/heatmap.json`](data/heatmap.json) and
+[`data/heatmap.png`](data/heatmap.png), without modifying the source records.
+The JSON contains ordered language/domain axes and 100 cells. Each cell's
+`occupied_pages_ratio` is the **arithmetic mean of the 20 passage ratios** for
+that language/domain, with `n: 20`. Every passage receives equal weight.
+The export also records its metric, aggregation, reference value and source
+file hash.
+
+The figure uses one linear diverging colour scale centred at **1.0**. Blue
+means less space and red means more. These results describe this selected
+corpus, Google NMT and the fixed Noto typography.
+
+![Mean occupied-page ratios by language and domain](data/heatmap.png)

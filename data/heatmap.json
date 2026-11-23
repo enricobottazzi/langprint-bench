@@ -1,0 +1,665 @@
+{
+  "schema_version": 1,
+  "metric": "occupied_pages_ratio",
+  "aggregation": "arithmetic_mean",
+  "reference": 1.0,
+  "passage_count": 200,
+  "languages": [
+    {
+      "code": "en",
+      "label": "English"
+    },
+    {
+      "code": "ar",
+      "label": "Arabic"
+    },
+    {
+      "code": "zh-Hans",
+      "label": "Chinese (simplified)"
+    },
+    {
+      "code": "de",
+      "label": "German"
+    },
+    {
+      "code": "hi",
+      "label": "Hindi"
+    },
+    {
+      "code": "it",
+      "label": "Italian"
+    },
+    {
+      "code": "ja",
+      "label": "Japanese"
+    },
+    {
+      "code": "ru",
+      "label": "Russian"
+    },
+    {
+      "code": "es",
+      "label": "Spanish"
+    },
+    {
+      "code": "sw",
+      "label": "Swahili"
+    }
+  ],
+  "disciplines": [
+    "fiction/stories",
+    "news",
+    "food/cooking",
+    "health",
+    "travel/places",
+    "sports",
+    "work/money",
+    "nature/environment",
+    "science/technology",
+    "arts/culture"
+  ],
+  "cells": [
+    {
+      "lang": "en",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 1.0515079957885543,
+      "n": 20
+    },
+    {
+      "lang": "en",
+      "discipline": "news",
+      "occupied_pages_ratio": 1.0682069469087454,
+      "n": 20
+    },
+    {
+      "lang": "en",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 1.0425528003232754,
+      "n": 20
+    },
+    {
+      "lang": "en",
+      "discipline": "health",
+      "occupied_pages_ratio": 1.0673002592695786,
+      "n": 20
+    },
+    {
+      "lang": "en",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 1.0721333427604276,
+      "n": 20
+    },
+    {
+      "lang": "en",
+      "discipline": "sports",
+      "occupied_pages_ratio": 1.0703404737669664,
+      "n": 20
+    },
+    {
+      "lang": "en",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 1.0654770051862994,
+      "n": 20
+    },
+    {
+      "lang": "en",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 1.0719447804730495,
+      "n": 20
+    },
+    {
+      "lang": "en",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 1.0553541048285562,
+      "n": 20
+    },
+    {
+      "lang": "en",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 1.0693688510474775,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 0.7039762833804175,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "news",
+      "occupied_pages_ratio": 0.6951829345700057,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 0.7101416588476729,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "health",
+      "occupied_pages_ratio": 0.7054187251162009,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 0.6974400469291763,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "sports",
+      "occupied_pages_ratio": 0.7125615882489298,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 0.6953836258711108,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 0.6936943413421118,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 0.6927315276174202,
+      "n": 20
+    },
+    {
+      "lang": "ar",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 0.6740944110872427,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 0.6966015789855932,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "news",
+      "occupied_pages_ratio": 0.6637721554301829,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 0.6537315781558604,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "health",
+      "occupied_pages_ratio": 0.6126350920829464,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 0.6697693397951218,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "sports",
+      "occupied_pages_ratio": 0.6716768590469504,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 0.6391423492032383,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 0.6273735792095618,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 0.6377078769160517,
+      "n": 20
+    },
+    {
+      "lang": "zh-Hans",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 0.6437433495733356,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 1.1958899997014045,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "news",
+      "occupied_pages_ratio": 1.1981967764758579,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 1.177740360821734,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "health",
+      "occupied_pages_ratio": 1.2115014199702152,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 1.1753491733098216,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "sports",
+      "occupied_pages_ratio": 1.1696516324194115,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 1.2005276818183015,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 1.2189553720760378,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 1.194162486563767,
+      "n": 20
+    },
+    {
+      "lang": "de",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 1.2128234351956764,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 0.7929166555873184,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "news",
+      "occupied_pages_ratio": 0.7683337198160334,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 0.7680416899401264,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "health",
+      "occupied_pages_ratio": 0.7656766170544951,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 0.7691123469002468,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "sports",
+      "occupied_pages_ratio": 0.7706628980680779,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 0.7717432069716613,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 0.7552109767351612,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 0.7683715530412162,
+      "n": 20
+    },
+    {
+      "lang": "hi",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 0.7654993664690055,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 1.1139030304551636,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "news",
+      "occupied_pages_ratio": 1.1452201064386869,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 1.1635135037535658,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "health",
+      "occupied_pages_ratio": 1.1485279055373536,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 1.135413361656132,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "sports",
+      "occupied_pages_ratio": 1.137194702657415,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 1.1700921413460725,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 1.1670413313953056,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 1.1453906492567012,
+      "n": 20
+    },
+    {
+      "lang": "it",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 1.153254800079383,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 0.9577394116406962,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "news",
+      "occupied_pages_ratio": 0.8860815834445109,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 0.8912847646292498,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "health",
+      "occupied_pages_ratio": 0.8494821055817641,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 0.8965620368411995,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "sports",
+      "occupied_pages_ratio": 0.911644450461732,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 0.8654782078912928,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 0.8239732582436197,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 0.8912442366369501,
+      "n": 20
+    },
+    {
+      "lang": "ja",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 0.8842146543226692,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 1.206823166422668,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "news",
+      "occupied_pages_ratio": 1.2586885318568417,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 1.2696039377681685,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "health",
+      "occupied_pages_ratio": 1.3085090714743186,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 1.2726910433170382,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "sports",
+      "occupied_pages_ratio": 1.2665278016708765,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 1.2806031796278219,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 1.312763254459441,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 1.3250506309321135,
+      "n": 20
+    },
+    {
+      "lang": "ru",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 1.2833716727165798,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 1.1171030914041622,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "news",
+      "occupied_pages_ratio": 1.1532045840452863,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 1.1595836460165343,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "health",
+      "occupied_pages_ratio": 1.1806114424511647,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 1.1525331914415768,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "sports",
+      "occupied_pages_ratio": 1.1502497190547205,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 1.1671870940730518,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 1.190751064121902,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 1.170046705267077,
+      "n": 20
+    },
+    {
+      "lang": "es",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 1.1669484853924432,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "fiction/stories",
+      "occupied_pages_ratio": 1.1635387866340217,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "news",
+      "occupied_pages_ratio": 1.1631126610138491,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "food/cooking",
+      "occupied_pages_ratio": 1.1638060597438122,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "health",
+      "occupied_pages_ratio": 1.150337361461963,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "travel/places",
+      "occupied_pages_ratio": 1.1589961170492593,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "sports",
+      "occupied_pages_ratio": 1.1394898746049207,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "work/money",
+      "occupied_pages_ratio": 1.1443655080111494,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "nature/environment",
+      "occupied_pages_ratio": 1.1382920419438094,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "science/technology",
+      "occupied_pages_ratio": 1.119940228940147,
+      "n": 20
+    },
+    {
+      "lang": "sw",
+      "discipline": "arts/culture",
+      "occupied_pages_ratio": 1.1466809741161874,
+      "n": 20
+    }
+  ],
+  "source_file": "results.json",
+  "source_sha256": "852574d6d224c1a4f8ce3ffc9bda8b9cd5cf2dd45e34535e21310a6154daa1b3"
+}
