@@ -1,6 +1,7 @@
 """Regression checks for the shared prose paginator and stored page scores."""
 
 import json
+import os
 from pathlib import Path
 import re
 import unittest
@@ -77,6 +78,9 @@ class RendererTests(unittest.TestCase):
                 self.assertEqual(edition.locator(".page--index").first.get_attribute("data-folio"),
                                  str(3 + book["aboutPages"]))
         print("About pagination:", report["about"])
+        report_path = os.environ.get("LANGPRINT_FIT_REPORT")
+        if report_path:
+            Path(report_path).write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
 
     def test_page_boundaries_for_22_and_42_lines(self):
         for count, expected in [(22, [21, 1]), (42, [21, 21])]:

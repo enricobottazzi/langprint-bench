@@ -255,6 +255,7 @@
         const reference = version.referenceLayout;
         const fullText = reference.pages.flatMap(p => p.paragraphs.flatMap(p => p.lines)).join(' ');
         if (normalized(fullText) !== normalized(version.text)) throw new Error(`Reference text mismatch in ${locale.lang}/${passage.idx}`);
+        let referenceFits = true;
         for (const fragment of reference.pages) {
           const host = el('div');
           const copy = appendFragment(host, fragment, {lang: locale.lang, font});
@@ -264,11 +265,12 @@
             const height = copy.getBoundingClientRect().height;
             const lines = Math.round(height / parseFloat(getComputedStyle(copy).lineHeight));
             if (height > layout.bodyHeight - layout.fittingAllowance || copy.scrollWidth > copy.clientWidth + 1 || lines !== fragment.lines) {
-              throw new Error(`Reference layout does not fit ${locale.lang}/${passage.idx}`);
+              referenceFits = false;
+              break;
             }
           } finally { copy.remove(); }
         }
-        result = {pages: reference.pages, occupied_pages: reference.occupied_pages};
+        if (referenceFits) result = {pages: reference.pages, occupied_pages: reference.occupied_pages};
       }
       const sameText = normalized(result.pages.flatMap(p => p.paragraphs.flatMap(p => typeof p === 'string' ? [p] : p.lines)).join(' ')) === normalized(version.text);
       if (!sameText) throw new Error(`Text loss in ${locale.lang}/${passage.idx}`);

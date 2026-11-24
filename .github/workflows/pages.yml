@@ -24,7 +24,13 @@ jobs:
           pip install "$(sed -n '/^playwright==/p' requirements.txt)"
           python -m playwright install --with-deps --only-shell chromium
       - name: Verify all ten editions
+        env:
+          LANGPRINT_FIT_REPORT: ${{ runner.temp }}/book-fit-report.json
         run: python -m unittest test_book test_heatmap test_renderer.RendererTests.test_localized_about
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book-fit-report
+          path: ${{ runner.temp }}/book-fit-report.json
       - name: Package the standalone reader
         run: |
           mkdir site
