@@ -87,10 +87,11 @@
     page.append(content);
   }
 
+  const heatmapSpan = 0.4;
   function heatColor(value) {
     const center = [251, 245, 231];
     const end = value < 1 ? [135, 171, 139] : [199, 127, 120];
-    const amount = Math.min(1, Math.abs(value - 1) / .4);
+    const amount = Math.min(1, Math.abs(value - 1) / heatmapSpan);
     return `rgb(${center.map((c, i) => Math.round(c + (end[i] - c) * amount)).join(',')})`;
   }
 
@@ -130,7 +131,30 @@
       }
       body.append(row);
     }
-    table.append(body); frame.append(table); figure.append(frame); page.append(figure);
+    table.append(body);
+    frame.append(table);
+
+    const legend = el('figcaption', 'heatmap-legend');
+    const scale = el('div', 'heatmap-scale');
+    scale.dir = 'ltr';
+    const bar = el('div', 'heatmap-bar');
+    const stops = [1 - heatmapSpan, 1, 1 + heatmapSpan].map(heatColor);
+    bar.style.background = `linear-gradient(to right in srgb, ${stops.join(', ')})`;
+    const format = new Intl.NumberFormat(book.lang, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+    const definition = el('span', '', book.locale.ui.heatmapReference);
+    definition.id = `${book.lang}-heatmap-reference`;
+    scale.append(bar);
+    for (const offset of [-1, -0.5, 0, 0.5, 1]) {
+      const tick = el('bdi', '', format.format(1 + offset * heatmapSpan) + '×');
+      if (offset === 0) {
+        tick.className = 'heatmap-midpoint';
+        tick.setAttribute('aria-describedby', definition.id);
+      }
+      scale.append(tick);
+    }
+    legend.append(scale, definition);
+    figure.append(frame, legend);
+    page.append(figure);
   }
 
   async function makeContents(book) {
