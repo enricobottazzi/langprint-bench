@@ -2,7 +2,7 @@
 (() => {
   'use strict';
 
-  function mount({books, totalPages = 630}) {
+  function mount({books, totalPages}) {
     if (!books.length) throw new Error('No books were supplied.');
     const wide = matchMedia('(min-width: 851px)');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -254,7 +254,7 @@
       const link = event.target.closest('a[data-jump]');
       if (!link || !normalClick(event)) return;
       event.preventDefault();
-      navigateTo(link.dataset.jump === 'home' ? 1 : 5);
+      navigateTo(Number(link.hash.slice('#page-'.length)));
     });
     window.addEventListener('hashchange', readHash);
 

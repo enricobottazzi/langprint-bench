@@ -1,0 +1,49 @@
+name: Publish book to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install the browser for pagination checks
+        run: |
+          pip install "$(sed -n '/^playwright==/p' requirements.txt)"
+          python -m playwright install --with-deps --only-shell chromium
+      - name: Verify all ten editions
+        run: python -m unittest test_book test_heatmap test_renderer.RendererTests.test_localized_about
+      - name: Package the standalone reader
+        run: |
+          mkdir site
+          cp index.html book.js navigation.js renderer.js site/
+          cp assets/fonts/OFL.txt site/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

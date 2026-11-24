@@ -10,7 +10,6 @@
   const books = [];
   const mainFonts = {ar: 'Noto Naskh Arabic', hi: 'Noto Serif Devanagari', 'zh-Hans': 'Noto Serif SC', ja: 'Noto Serif JP'};
   const fontFor = lang => [...new Set([mainFonts[lang] || 'Noto Serif', 'Noto Serif', 'Noto Sans Mono', 'Noto Serif JP'])].map(f => JSON.stringify(f)).join(', ');
-  const latinFont = fontFor('en');
   const el = (tag, className, text) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -56,10 +55,10 @@
     return page;
   }
 
-  function appendFragment(page, fragment, {lang, font, latin = false}) {
+  function appendFragment(page, fragment, {lang, font}) {
     const copy = el('div', 'book-copy lp-copy');
-    copy.lang = latin ? 'la' : lang;
-    copy.dir = latin ? 'ltr' : lang === 'ar' ? 'rtl' : 'ltr';
+    copy.lang = lang;
+    copy.dir = lang === 'ar' ? 'rtl' : 'ltr';
     copy.style.width = layout.bodyWidth + 'px';
     copy.style.fontFamily = font;
     copy.dataset.lines = String(fragment.lines);
@@ -203,7 +202,7 @@
       throw new Error(`Contents exceeds its allocation: ${book.lang}`);
     }
     for (let i = 0; i < data.contentsPages; i++) {
-      const page = makePage(book, i + 5, {kind: 'index', title: book.locale.ui.contents, first: i === 0, blank: !fragments[i]});
+      const page = makePage(book, i + 3 + data.aboutPages, {kind: 'index', title: book.locale.ui.contents, first: i === 0, blank: !fragments[i]});
       if (fragments[i]) {
         const copy = el('div', 'index-copy lp-copy'); copy.style.width = layout.bodyWidth + 'px';
         copy.append(fragments[i]); page.insertBefore(copy, page.querySelector('.folio'));
@@ -227,16 +226,25 @@
     shell.append(previous, paper, next); block.append(caption, shell);
     const book = {lang: locale.lang, dir: locale.dir, locale, block, book: paper, shell, previous, next, pages: [], spreads: [], font, number: numeral(locale)};
     makeTitle(book); makeHeatmap(book);
-    const about = await LangPrintRenderer.paginate({text: locale.aboutText, lang: 'en', fontFamily: latinFont});
-    report.about.push({lang: locale.lang, required: about.pages.length, available: 2});
-    if (about.pages.length > 2) {
-      report.overflows.push({lang: locale.lang, section: 'about', required: about.pages.length, available: 2});
+    const about = await LangPrintRenderer.paginate({text: locale.aboutText, lang: locale.lang, fontFamily: font});
+    report.about.push({lang: locale.lang, required: about.pages.length, available: data.aboutPages});
+    if (about.pages.length > data.aboutPages) {
+      report.overflows.push({lang: locale.lang, section: 'about', required: about.pages.length, available: data.aboutPages});
       reportNode.textContent = JSON.stringify(report);
       throw new Error(`About exceeds its allocation: ${locale.lang}`);
     }
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < data.aboutPages; i++) {
       const page = makePage(book, i + 3, {kind: 'text', title: locale.ui.about, first: i === 0, blank: !about.pages[i]});
-      if (about.pages[i]) appendFragment(page, about.pages[i], {lang: 'en', font: latinFont, latin: true});
+      if (!about.pages[i]) continue;
+      const copy = appendFragment(page, about.pages[i], book);
+      for (const paragraph of copy.children) {
+        const text = paragraph.textContent;
+        const start = text.indexOf('GitHub');
+        if (start < 0) continue;
+        const link = el('a', 'methodology-link', 'GitHub');
+        link.href = data.methodologyUrl;
+        paragraph.replaceChildren(text.slice(0, start), link, text.slice(start + link.textContent.length));
+      }
     }
     await makeContents(book);
     for (const passage of data.passages) {

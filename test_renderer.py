@@ -18,7 +18,6 @@ class RendererTests(unittest.TestCase):
         # Public score() owns its Playwright context; do not nest sync runtimes.
         if self._testMethodName == "test_stored_score_regressions":
             return
-        font = scorer._font_path("Noto Serif")
         runtime = sync_playwright().start()
         self.addCleanup(runtime.stop)
         browser = runtime.chromium.launch()
@@ -27,6 +26,11 @@ class RendererTests(unittest.TestCase):
             viewport={"width": 930, "height": 624}, device_scale_factor=1,
             locale="en-US", offline=True,
         )
+
+        self.page = context.new_page()
+        if self._testMethodName == "test_localized_about":
+            return
+        font = scorer._font_path("Noto Serif")
 
         def serve_font(route):
             if route.request.url == "https://langprint.invalid/0.ttf":
@@ -37,7 +41,6 @@ class RendererTests(unittest.TestCase):
                 route.abort()
 
         context.route("**/*", serve_font)
-        self.page = context.new_page()
 
     def render(self, text):
         self.page.set_content(scorer._HTML)
@@ -47,23 +50,33 @@ class RendererTests(unittest.TestCase):
             "fonts": [{"family": "Noto Serif", "url": "https://langprint.invalid/0.ttf"}],
         })
 
-    def test_about_fills_pages_and_preserves_text(self):
-        html = (ROOT / "index.html").read_text()
-        source = re.search(
-            r'<script\b[^>]*\bid=([\'"])book-text\1[^>]*>(.*?)</script>',
-            html, re.DOTALL,
-        )
-        self.assertIsNotNone(source, "About must have one continuous source text")
-        sections = json.loads(source.group(2))
-        about = next(section for section in sections if section["id"] == "about")
-        result = self.render(about["text"])
-        self.assertEqual(len(result["pages"]), 2)
-        self.assertEqual(result["pages"][0]["lines"], 21)
-        self.assertTrue(all(0 < page["lines"] <= 21 for page in result["pages"]))
-        rendered = " ".join(
-            paragraph for page in result["pages"] for paragraph in page["paragraphs"]
-        )
-        self.assertEqual(rendered.split(), about["text"].split())
+    def test_localized_about(self):
+        self.page.goto((ROOT / "index.html").as_uri() + "#page-3")
+        self.page.wait_for_function("document.documentElement.dataset.ready", timeout=240_000)
+        self.assertEqual(self.page.locator("html").get_attribute("data-ready"), "true",
+                         self.page.locator("#book-position").text_content())
+        book = json.loads(self.page.locator("#book-data").text_content())
+        report = json.loads(self.page.locator("#fit-report").text_content())
+        self.assertFalse(report["overflows"])
+        self.assertEqual(len(report["about"]), 10)
+        required = max(entry["required"] for entry in report["about"])
+        self.assertEqual(book["aboutPages"], 2 * ((required + 1) // 2))
+        for locale in book["languages"]:
+            with self.subTest(lang=locale["lang"]):
+                edition = self.page.locator(f'article[data-lang="{locale["lang"]}"]')
+                pages = edition.locator('.page[data-section="text"]')
+                self.assertEqual(pages.count(), book["aboutPages"])
+                body = pages.locator(".book-copy")
+                self.assertEqual(body.first.get_attribute("lang"), locale["lang"])
+                self.assertEqual(body.first.get_attribute("dir"), locale["dir"])
+                compact = lambda text: re.sub(r"\s+", "", text)
+                self.assertEqual(compact("".join(body.locator("p").all_text_contents())),
+                                 compact(locale["aboutText"]))
+                self.assertEqual(body.get_by_role("link", include_hidden=True).count(), 1)
+                self.assertEqual(body.locator("a").get_attribute("href"), book["methodologyUrl"])
+                self.assertEqual(edition.locator(".page--index").first.get_attribute("data-folio"),
+                                 str(3 + book["aboutPages"]))
+        print("About pagination:", report["about"])
 
     def test_page_boundaries_for_22_and_42_lines(self):
         for count, expected in [(22, [21, 1]), (42, [21, 21])]:

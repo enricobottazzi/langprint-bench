@@ -1,5 +1,5 @@
 {
-  "requested_codepoints": 4072,
+  "requested_codepoints": 4075,
   "includes_locales": true,
   "locales_sha256": "c5d59e93c43f1306e48c5023b63c0b685546e502d417d2e731f66aeecd9fd013",
   "fonts": [
@@ -152,15 +152,15 @@
     {
       "family": "Noto Serif JP",
       "file": "noto-serif-jp.woff",
-      "bytes": 951372,
+      "bytes": 951132,
       "source_filename": "NotoSerifJP[wght].ttf",
       "source_sha256": "2fd527ba12b6a44ec30d796d633360da0aeba6c5d4af1304ce12bb4dc15a7dfc",
-      "sha256": "246cc4629276f473004261383c5a1d38780a8a28548effce6fa320bb62e3d5c5",
+      "sha256": "c2271599f7484c1ff81a8f4cd4445c21302e9f9413c02c3ec17b6e58eb49601e",
       "axes": {
         "wght": 400
       },
-      "codepoints": 3216,
-      "glyphs": 4192,
+      "codepoints": 3219,
+      "glyphs": 4194,
       "copyright": [
         "(c) 2017-2024 Adobe (http://www.adobe.com/)."
       ],

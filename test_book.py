@@ -22,7 +22,8 @@ class BookTests(unittest.TestCase):
         self.assertEqual(len(self.book['languages']), 10)
         self.assertEqual(len(self.book['passages']), 200)
         self.assertEqual(self.book['contentsPages'], 22)
-        next_page = 27
+        self.assertIn(self.book['aboutPages'], (2, 4, 6))
+        next_page = 3 + self.book['aboutPages'] + self.book['contentsPages']
         for passage in self.book['passages']:
             self.assertEqual(passage['startPage'], next_page)
             self.assertIn(passage['allocatedPages'], (2, 4, 6))
@@ -35,12 +36,15 @@ class BookTests(unittest.TestCase):
                 self.assertLessEqual(version['occupiedPages'], passage['allocatedPages'])
             next_page = passage['endPage'] + 1
         self.assertEqual(next_page, self.book['totalPages'] + 1)
-        self.assertEqual(self.book['totalPages'], 632)
+        self.assertEqual(self.book['totalPages'], 634)
 
-    def test_localized_original_titles_and_unchanged_latin_about(self):
-        about = json.loads(re.search(r'<script id="book-text" type="application/json">(.*?)</script>', self.html, re.S).group(1))[0]['text']
-        for locale in self.book['languages']:
-            self.assertEqual(locale['aboutText'], about)
+    def test_localized_original_titles_and_about(self):
+        editions = self.book['languages']
+        self.assertEqual(len({locale['aboutText'] for locale in editions}), 10)
+        self.assertTrue((ROOT / self.book['methodologyUrl'].split('/')[-1]).is_file())
+        for locale in editions:
+            self.assertEqual(len(locale['aboutText'].split('\n\n')), 6)
+            self.assertEqual(locale['aboutText'].count('GitHub'), 1)
             self.assertEqual(len(locale['titles']), 200)
             self.assertEqual(locale['dir'], 'rtl' if locale['lang'] == 'ar' else 'ltr')
             originals = [r for (idx, lang), r in self.rows.items() if lang == locale['lang'] and r['original'] == 1]
